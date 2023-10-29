@@ -1,7 +1,7 @@
 # cofe
 
 ## Preview
-[![asciicast](https://asciinema.org/a/YuqrX6psGeV0lJf6lDCE6Wh1F.svg)](https://asciinema.org/a/YuqrX6psGeV0lJf6lDCE6Wh1F)
+[![asciicast](https://asciinema.org/a/5iMyxSZoAIYGRFms4a7FXbx8J.svg)](https://asciinema.org/a/5iMyxSZoAIYGRFms4a7FXbx8J)
 
 ## Quick-start
 Download and install:
