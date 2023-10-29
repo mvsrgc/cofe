@@ -88,7 +88,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) RunningHelpView() string {
-	return "\n" + m.help.ShortHelpView([]key.Binding{
+	return "\n     " + m.help.ShortHelpView([]key.Binding{
 		m.keymap.start,
 		m.keymap.stop,
 		m.keymap.reset,
@@ -97,22 +97,22 @@ func (m model) RunningHelpView() string {
 }
 
 func (m model) DoneHelpView() string {
-	return "\n" + m.help.ShortHelpView([]key.Binding{
+	return "\n     " + m.help.ShortHelpView([]key.Binding{
 		m.keymap.reset,
 		m.keymap.quit,
 	})
 }
 
 func (m model) View() string {
-	s := m.timer.View()
+	s := "\n     " + m.timer.View()
 
 	if m.timer.Timedout() {
-		s = "All done!" +
+		s = "\n\n     All done!\n\n" +
 			m.DoneHelpView()
 	}
 	s += "\n"
 	if !m.quitting {
-		s = "Time remaining: " + s
+		s = "\n\n     Time remaining: " + s
 		s += m.RunningHelpView()
 	}
 
@@ -188,7 +188,7 @@ func main() {
 	}
 	m.keymap.start.SetEnabled(false)
 
-	if _, err := tea.NewProgram(m).Run(); err != nil {
+	if _, err := tea.NewProgram(m, tea.WithAltScreen()).Run(); err != nil {
 		fmt.Println("Uh oh, we encountered an error:", err)
 		os.Exit(1)
 	}
