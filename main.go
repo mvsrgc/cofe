@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bytes"
+	_ "embed"
 	"fmt"
 	"log"
 	"os"
@@ -33,6 +35,9 @@ type keymap struct {
 	reset key.Binding
 	quit  key.Binding
 }
+
+//go:embed timer_done.wav
+var soundFile []byte
 
 func (m model) Init() tea.Cmd {
 	return m.timer.Init()
@@ -118,10 +123,7 @@ type processFinishedMsg bool
 
 func play_sound() tea.Cmd {
 	return func() tea.Msg {
-		f, err := os.Open("timer_done.wav")
-		if err != nil {
-			log.Fatal(err)
-		}
+		f := bytes.NewReader(soundFile)
 
 		streamer, format, err := wav.Decode(f)
 		if err != nil {
