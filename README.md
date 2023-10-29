@@ -9,11 +9,11 @@ sudo mv cofe /usr/local/bin
 ```
 
 Run a 4 minute timer (default):
-`go run main.go`
+`cofe`
 
 Run a custom time :
-`go run main.go 1h`
-`go run main.go 15ms`
-`go run main.go 0.5m`
-`go run main.go 30s`
-`go run main.go 15ms`
+`cofe 1h`
+`cofe 15ms`
+`cofe 0.5m`
+`cofe 30s`
+`cofe 15ms`
