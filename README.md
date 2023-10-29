@@ -14,9 +14,12 @@ sudo mv cofe /usr/local/bin
 Run a 4 minute timer (default):
 `cofe`
 
-Run a custom time :
+Run a custom time:
 `cofe 1h`
 `cofe 15ms`
 `cofe 0.5m`
 `cofe 30s`
 `cofe 15ms`
+
+Output to stdout with no decorations (and write to /tmp/cofe_status):
+`cofe --raw 1m`
