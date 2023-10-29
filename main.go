@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	_ "embed"
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -27,6 +28,7 @@ type model struct {
 	quitting     bool
 	soundPlaying bool
 	timeout      time.Duration
+	raw          bool
 }
 
 type keymap struct {
@@ -60,7 +62,16 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case timer.TimeoutMsg:
 		m.quitting = true
 		m.soundPlaying = true
-		return m, play_sound()
+
+		var cmd tea.Cmd
+		if m.raw {
+			cmd = tea.Quit
+			time.Sleep(5000 * time.Millisecond)
+		} else {
+			cmd = play_sound()
+		}
+
+		return m, cmd
 
 	case tea.KeyMsg:
 		switch {
@@ -104,16 +115,28 @@ func (m model) DoneHelpView() string {
 }
 
 func (m model) View() string {
-	s := "\n     " + m.timer.View()
+	var s string
 
-	if m.timer.Timedout() {
-		s = "\n\n     All done!\n\n" +
-			m.DoneHelpView()
-	}
-	s += "\n"
-	if !m.quitting {
-		s = "\n\n     Time remaining: " + s
-		s += m.RunningHelpView()
+	if m.raw {
+		s = m.timer.Timeout.String()
+
+		os.WriteFile("/tmp/cofe_status", []byte(s), 0644)
+
+		if m.timer.Timedout() {
+			s = "All done!"
+		}
+	} else {
+		s = "\n     " + m.timer.Timeout.String()
+		s += "\n"
+
+		if m.timer.Timedout() {
+			s = "\n\n     All done!\n\n" +
+				m.DoneHelpView()
+		}
+		if !m.quitting {
+			s = "\n\n     Time remaining: " + s
+			s += m.RunningHelpView()
+		}
 	}
 
 	return s
@@ -154,18 +177,27 @@ func stopSound() tea.Cmd {
 }
 
 func main() {
-	args := os.Args[1:]
 	timeout := default_timeout
 
-	if len(args) == 1 {
-		if customTimeout, err := time.ParseDuration(args[0]); err == nil {
+	var raw bool
+	flag.BoolVar(&raw, "raw", false, "Output raw time remaining to stdout")
+	flag.Parse()
+
+	remainingArgs := flag.Args()
+
+	if len(remainingArgs) == 1 {
+		if customTimeout, err := time.ParseDuration(remainingArgs[0]); err == nil {
 			timeout = customTimeout
+		} else {
+			fmt.Println("First argument has to be the desired duration.")
+			os.Exit(1)
 		}
 	}
 
 	m := model{
-		timer:   timer.NewWithInterval(timeout, time.Millisecond),
+		timer:   timer.NewWithInterval(timeout, time.Second),
 		timeout: timeout,
+		raw:     raw,
 		keymap: keymap{
 			start: key.NewBinding(
 				key.WithKeys("s"),
@@ -188,7 +220,12 @@ func main() {
 	}
 	m.keymap.start.SetEnabled(false)
 
-	if _, err := tea.NewProgram(m, tea.WithAltScreen()).Run(); err != nil {
+	var options []tea.ProgramOption
+	if !m.raw {
+		options = append(options, tea.WithAltScreen())
+	}
+
+	if _, err := tea.NewProgram(m, options...).Run(); err != nil {
 		fmt.Println("Uh oh, we encountered an error:", err)
 		os.Exit(1)
 	}
