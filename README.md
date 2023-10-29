@@ -1,5 +1,8 @@
 # cofe
 
+## Preview
+[![asciicast](https://asciinema.org/a/YuqrX6psGeV0lJf6lDCE6Wh1F.svg)](https://asciinema.org/a/YuqrX6psGeV0lJf6lDCE6Wh1F)
+
 ## Quick-start
 Download and install:
 ```bash
